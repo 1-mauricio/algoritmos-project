@@ -62,7 +62,7 @@ if __name__ == '__main__':
     vertices = []
     nome = {}
     grafo = {}
-    
+    big = 0
 
     data = open('data\lesmis.txt', 'r')
 
@@ -79,11 +79,18 @@ if __name__ == '__main__':
             target = next(data).split()
             value = next(data).split()
 
+            if int(value[1]) > big:
+                big = int(value[1])
+
             grafo[int(source[1])][int(target[1])] = int(value[1])
             grafo[int(target[1])][int(source[1])] = int(value[1])
 
-
     g = Grafo(vertices, grafo)
-    previous_nodes, shortest_path = g.dijkstra_algorithm(15)
-    # print(nome[66])
-    print(shortest_path[66])
+    print(big)
+
+    s = int(input("Escolha seu personagem source: "))
+    while s >= 0:
+        t = int(input("Escolha seu personagem target: "))
+        previous_nodes, shortest_path = g.dijkstra_algorithm(s)
+        print(f"{nome[s]} --> {nome[t]} = {shortest_path[t]}")
+        s = int(input("Escolha seu personagem source: "))
