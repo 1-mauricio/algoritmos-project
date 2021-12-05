@@ -1,65 +1,55 @@
-import sys
-
 class Grafo:
     def __init__(self, vertices, arestas):
         self.V = vertices
         self.A = arestas
 
-    def vizinhos(self, node):
-        "Returns the neighbors of a node."
-        conexoes = []
-        for out_node in self.V:
-            if self.A[node].get(out_node, False) != False:
-                conexoes.append(out_node)
-        return conexoes
+    def get_shortest_path(self, menor_caminho, not_cheked):
+        menor_custo = inf
+        node_menor_custo = None
+        for node in not_cheked:
+            if menor_caminho[node] <= menor_custo:
+                menor_custo = menor_caminho[node]
+                node_menor_custo = node
+        return node_menor_custo
 
-    def dijkstra_algorithm(self, start):
-        nao_visitados = list(self.V)
-    
-        # We'll use this dict to save the cost of visiting each node and update it as we move along the graph   
+    def dijkstra_algorithm(self, source, target):
         menor_caminho = {}
-    
-        # We'll use this dict to save the shortest known path to a node found so far
-        previous_nodes = {}
-    
-        # We'll use max_value to initialize the "infinity" value of the unvisited nodes   
-        max_value = sys.maxsize
+        vizinhos = {}
+        for node in self.A:
+            menor_caminho[node] = float('inf')
+            vizinhos[node] = {}
 
-        for node in nao_visitados:
-            menor_caminho[node] = max_value
-        # However, we initialize the starting node's value with 0   
-        menor_caminho[start] = 0
-        
-        # The algorithm executes until we visit all nodes
+        menor_caminho[source] = 0
+
+        nao_visitados = [node for node in menor_caminho]
+        node  = self.get_shortest_path(menor_caminho, nao_visitados)
         while nao_visitados:
-            # The code block below finds the node with the lowest score
-            current_min_node = None
-            for node in nao_visitados: # Iterate over the nodes
-                if current_min_node == None:
-                    current_min_node = node
-                elif menor_caminho[node] < menor_caminho[current_min_node]:
-                    current_min_node = node
-                    
-            # The code block below retrieves the current node's neighbors and updates their distances
-            vizinhos = self.vizinhos(current_min_node)
-            for vizinho in vizinhos:
-                valor_tentado = menor_caminho[current_min_node] + self.A[current_min_node][vizinho]
-                if valor_tentado < menor_caminho[vizinho]:
-                    
-                    menor_caminho[vizinho] = valor_tentado
-                    # We also update the best path to the current node
-                    previous_nodes[vizinho] = current_min_node
-    
-            # After visiting its neighbors, we mark the node as "visited"
-            nao_visitados.remove(current_min_node)
-    
-        return previous_nodes, menor_caminho
+            custo_atual = menor_caminho[node]
+            custo_vizinho = self.A[node]
+            for c in custo_vizinho:
+                if menor_caminho[c] > custo_atual + custo_vizinho[c]:
+                    menor_caminho[c] = custo_atual + custo_vizinho[c]
+                    vizinhos[c] = node
+
+            nao_visitados.pop(nao_visitados.index(node))
+            node = self.get_shortest_path(menor_caminho, nao_visitados)
+
+        if menor_caminho[target] < inf:
+            caminho = [target]
+            i = 0
+            while source not in caminho:
+                caminho.append(vizinhos[caminho[i]])
+                i += 1
+            caminho.reverse()
+
+        return caminho, menor_caminho
+
 
 if __name__ == '__main__':
+    inf = float('inf')
     vertices = []
     nome = {}
     grafo = {}
-    big = 0
 
     data = open('data\lesmis.txt', 'r')
 
@@ -76,19 +66,24 @@ if __name__ == '__main__':
             target = next(data).split()
             value = next(data).split()
 
-            if int(value[1]) > big:
-                big = int(value[1])
-
             grafo[int(source[1])][int(target[1])] = int(value[1])
             grafo[int(target[1])][int(source[1])] = int(value[1])
 
     g = Grafo(vertices, grafo)
-    # peso 1 - 31
 
-    s = int(input("Escolha seu personagem partida: "))
+    print("="*30)
+    print("DE ENCONTRO A JEAN VALJEAN")
+    print("="*30)
+
+    s = int(input("\nEscolha seu personagem partida: "))
     while s >= 0:
         t = int(input("Escolha seu personagem destino: "))
-        previous_nodes, menor_caminho = g.dijkstra_algorithm(s)
-        print(previous_nodes)
-        print(f"{nome[s]} --> {nome[t]} = {menor_caminho[t]}")
-        s = int(input("Escolha seu personagem source: "))
+        caminho, menor_caminho = g.dijkstra_algorithm(s,t)
+        nomes = []
+        for i in caminho:
+            nomes.append(nome[i])
+
+        print(f'Para chegar em {nome[t]}, {nome[s]} precisa passar por: {nomes}, e isso tem custo de {menor_caminho[t]}')
+
+        s = int(input("\nEscolha seu personagem source: "))
+    
