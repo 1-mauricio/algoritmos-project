@@ -5,23 +5,19 @@ class Grafo:
         self.V = vertices
         self.A = arestas
 
-    def get_outgoing_edges(self, node):
+    def vizinhos(self, node):
         "Returns the neighbors of a node."
-        connections = []
+        conexoes = []
         for out_node in self.V:
             if self.A[node].get(out_node, False) != False:
-                connections.append(out_node)
-        return connections
+                conexoes.append(out_node)
+        return conexoes
 
-    def value(self, node1, node2):
-        "Returns the value of an edge between two nodes."
-        return self.A[node1][node2]
-
-    def dijkstra_algorithm(self, start_node):
-        unvisited_nodes = list(self.V)
+    def dijkstra_algorithm(self, start):
+        nao_visitados = list(self.V)
     
         # We'll use this dict to save the cost of visiting each node and update it as we move along the graph   
-        shortest_path = {}
+        menor_caminho = {}
     
         # We'll use this dict to save the shortest known path to a node found so far
         previous_nodes = {}
@@ -29,34 +25,35 @@ class Grafo:
         # We'll use max_value to initialize the "infinity" value of the unvisited nodes   
         max_value = sys.maxsize
 
-        for node in unvisited_nodes:
-            shortest_path[node] = max_value
+        for node in nao_visitados:
+            menor_caminho[node] = max_value
         # However, we initialize the starting node's value with 0   
-        shortest_path[start_node] = 0
+        menor_caminho[start] = 0
         
         # The algorithm executes until we visit all nodes
-        while unvisited_nodes:
+        while nao_visitados:
             # The code block below finds the node with the lowest score
             current_min_node = None
-            for node in unvisited_nodes: # Iterate over the nodes
+            for node in nao_visitados: # Iterate over the nodes
                 if current_min_node == None:
                     current_min_node = node
-                elif shortest_path[node] < shortest_path[current_min_node]:
+                elif menor_caminho[node] < menor_caminho[current_min_node]:
                     current_min_node = node
                     
             # The code block below retrieves the current node's neighbors and updates their distances
-            neighbors = self.get_outgoing_edges(current_min_node)
-            for neighbor in neighbors:
-                tentative_value = shortest_path[current_min_node] + self.value(current_min_node, neighbor)
-                if tentative_value < shortest_path[neighbor]:
-                    shortest_path[neighbor] = tentative_value
+            vizinhos = self.vizinhos(current_min_node)
+            for vizinho in vizinhos:
+                valor_tentado = menor_caminho[current_min_node] + self.A[current_min_node][vizinho]
+                if valor_tentado < menor_caminho[vizinho]:
+                    
+                    menor_caminho[vizinho] = valor_tentado
                     # We also update the best path to the current node
-                    previous_nodes[neighbor] = current_min_node
+                    previous_nodes[vizinho] = current_min_node
     
             # After visiting its neighbors, we mark the node as "visited"
-            unvisited_nodes.remove(current_min_node)
+            nao_visitados.remove(current_min_node)
     
-        return previous_nodes, shortest_path
+        return previous_nodes, menor_caminho
 
 if __name__ == '__main__':
     vertices = []
@@ -86,11 +83,12 @@ if __name__ == '__main__':
             grafo[int(target[1])][int(source[1])] = int(value[1])
 
     g = Grafo(vertices, grafo)
-    print(big)
+    # peso 1 - 31
 
-    s = int(input("Escolha seu personagem source: "))
+    s = int(input("Escolha seu personagem partida: "))
     while s >= 0:
-        t = int(input("Escolha seu personagem target: "))
-        previous_nodes, shortest_path = g.dijkstra_algorithm(s)
-        print(f"{nome[s]} --> {nome[t]} = {shortest_path[t]}")
+        t = int(input("Escolha seu personagem destino: "))
+        previous_nodes, menor_caminho = g.dijkstra_algorithm(s)
+        print(previous_nodes)
+        print(f"{nome[s]} --> {nome[t]} = {menor_caminho[t]}")
         s = int(input("Escolha seu personagem source: "))
