@@ -41,6 +41,8 @@ class Grafo:
                 caminho.append(vizinhos[caminho[i]])
                 i += 1
             caminho.reverse()
+        else:
+            return "Não é possível chegar ao destino"
 
         return caminho, menor_caminho
 
@@ -78,12 +80,16 @@ if __name__ == '__main__':
     s = int(input("\nEscolha seu personagem partida: "))
     while s >= 0:
         t = int(input("Escolha seu personagem destino: "))
-        caminho, menor_caminho = g.dijkstra_algorithm(s,t)
-        nomes = []
-        for i in caminho:
-            nomes.append(nome[i])
+        retorno = g.dijkstra_algorithm(s,t)
+        if len(retorno) == 1:
+            print(retorno)
+        else:
+            caminho, custo_menor_caminho = retorno
+            nomes = []
+            for i in caminho:
+                nomes.append(nome[i])
 
-        print(f'Para chegar em {nome[t]}, {nome[s]} precisa passar por: {nomes}, e isso tem custo de {menor_caminho[t]}')
+            print(f'Para chegar em {nome[t]}, {nome[s]} precisa passar por: {nomes}, e isso tem custo de {custo_menor_caminho[t]}')
 
         s = int(input("\nEscolha seu personagem source: "))
     
