@@ -89,7 +89,7 @@ if __name__ == '__main__':
             for i in caminho:
                 nomes.append(nome[i])
 
-            print(f'Para chegar em {nome[t]}, {nome[s]} precisa passar por: {nomes}, e isso tem custo de {custo_menor_caminho[t]}')
+            print(f'Para chegar em {nome[t]}, {nome[s]} precisa passar por: {nomes},\ne isso tem custo de {custo_menor_caminho[t]}')
 
-        s = int(input("\nEscolha seu personagem source: "))
+        s = int(input("\nEscolha seu personagem partida: "))
     
